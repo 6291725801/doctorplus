@@ -437,132 +437,157 @@ export async function updateMediaAsset(
  * Retrieves a published CMS page by its slug with its sections.
  */
 export async function getPageBySlug(slug: string, clinicId?: string) {
-  let targetClinicId = clinicId;
-  if (!targetClinicId) {
-    const active = await getActiveClinic().catch(() => null);
-    if (!active) return null;
-    targetClinicId = active.id;
-  }
+  try {
+    let targetClinicId = clinicId;
+    if (!targetClinicId) {
+      const active = await getActiveClinic().catch(() => null);
+      if (!active) return null;
+      targetClinicId = active.id;
+    }
 
-  return prisma.page.findUnique({
-    where: {
-      clinicId_slug: {
-        clinicId: targetClinicId,
-        slug,
+    return await prisma.page.findUnique({
+      where: {
+        clinicId_slug: {
+          clinicId: targetClinicId,
+          slug,
+        },
       },
-    },
-    include: {
-      sections: {
-        where: { isVisible: true },
-        orderBy: { sortOrder: "asc" },
+      include: {
+        sections: {
+          where: { isVisible: true },
+          orderBy: { sortOrder: "asc" },
+        },
       },
-    },
-  });
+    });
+  } catch (err) {
+    console.warn(`[CMS Service] Could not fetch page "${slug}" from DB:`, (err as Error).message);
+    return null;
+  }
 }
 
 /**
  * Retrieves all published clinical services for public directory.
  */
 export async function getPublicServices(clinicId?: string) {
-  let targetClinicId = clinicId;
-  if (!targetClinicId) {
-    const active = await getActiveClinic().catch(() => null);
-    if (!active) return [];
-    targetClinicId = active.id;
-  }
+  try {
+    let targetClinicId = clinicId;
+    if (!targetClinicId) {
+      const active = await getActiveClinic().catch(() => null);
+      if (!active) return [];
+      targetClinicId = active.id;
+    }
 
-  return prisma.service.findMany({
-    where: {
-      clinicId: targetClinicId,
-      isActive: true,
-    },
-    include: {
-      doctors: {
-        include: {
-          doctor: {
-            include: {
-              user: { select: { fullName: true, email: true } },
+    return await prisma.service.findMany({
+      where: {
+        clinicId: targetClinicId,
+        isActive: true,
+      },
+      include: {
+        doctors: {
+          include: {
+            doctor: {
+              include: {
+                user: { select: { fullName: true, email: true } },
+              },
             },
           },
         },
       },
-    },
-    orderBy: { sortOrder: "asc" },
-  });
+      orderBy: { sortOrder: "asc" },
+    });
+  } catch (err) {
+    console.warn("[CMS Service] Could not fetch public services from DB:", (err as Error).message);
+    return [];
+  }
 }
 
 /**
  * Retrieves a single clinical service by its slug.
  */
 export async function getPublicServiceBySlug(slug: string, clinicId?: string) {
-  let targetClinicId = clinicId;
-  if (!targetClinicId) {
-    const active = await getActiveClinic().catch(() => null);
-    if (!active) return null;
-    targetClinicId = active.id;
-  }
+  try {
+    let targetClinicId = clinicId;
+    if (!targetClinicId) {
+      const active = await getActiveClinic().catch(() => null);
+      if (!active) return null;
+      targetClinicId = active.id;
+    }
 
-  return prisma.service.findUnique({
-    where: {
-      clinicId_slug: {
-        clinicId: targetClinicId,
-        slug,
+    return await prisma.service.findUnique({
+      where: {
+        clinicId_slug: {
+          clinicId: targetClinicId,
+          slug,
+        },
       },
-    },
-    include: {
-      doctors: {
-        include: {
-          doctor: {
-            include: {
-              user: { select: { fullName: true, phone: true } },
-              schedules: { where: { isAvailable: true } },
+      include: {
+        doctors: {
+          include: {
+            doctor: {
+              include: {
+                user: { select: { fullName: true, phone: true } },
+                schedules: { where: { isAvailable: true } },
+              },
             },
           },
         },
       },
-    },
-  });
+    });
+  } catch (err) {
+    console.warn(`[CMS Service] Could not fetch service "${slug}" from DB:`, (err as Error).message);
+    return null;
+  }
 }
 
 /**
  * Retrieves all active doctors for the public specialists directory.
  */
 export async function getPublicDoctors(clinicId?: string) {
-  let targetClinicId = clinicId;
-  if (!targetClinicId) {
-    const active = await getActiveClinic().catch(() => null);
-    if (!active) return [];
-    targetClinicId = active.id;
-  }
+  try {
+    let targetClinicId = clinicId;
+    if (!targetClinicId) {
+      const active = await getActiveClinic().catch(() => null);
+      if (!active) return [];
+      targetClinicId = active.id;
+    }
 
-  return prisma.doctor.findMany({
-    where: {
-      clinicId: targetClinicId,
-      isActive: true,
-      isAvailableForBooking: true,
-    },
-    include: {
-      user: { select: { fullName: true, email: true, phone: true } },
-      services: { include: { service: true } },
-      schedules: { where: { isAvailable: true }, orderBy: { dayOfWeek: "asc" } },
-    },
-    orderBy: { createdAt: "asc" },
-  });
+    return await prisma.doctor.findMany({
+      where: {
+        clinicId: targetClinicId,
+        isActive: true,
+        isAvailableForBooking: true,
+      },
+      include: {
+        user: { select: { fullName: true, email: true, phone: true } },
+        services: { include: { service: true } },
+        schedules: { where: { isAvailable: true }, orderBy: { dayOfWeek: "asc" } },
+      },
+      orderBy: { createdAt: "asc" },
+    });
+  } catch (err) {
+    console.warn("[CMS Service] Could not fetch public doctors from DB:", (err as Error).message);
+    return [];
+  }
 }
 
 /**
  * Retrieves full public details of a doctor by their ID.
  */
 export async function getPublicDoctorById(doctorId: string) {
-  return prisma.doctor.findUnique({
-    where: { id: doctorId },
-    include: {
-      user: { select: { fullName: true, email: true, phone: true } },
-      services: { include: { service: true } },
-      schedules: { where: { isAvailable: true }, orderBy: { dayOfWeek: "asc" } },
-      clinic: { select: { name: true, phone: true, address: true, city: true } },
-    },
-  });
+  try {
+    return await prisma.doctor.findUnique({
+      where: { id: doctorId },
+      include: {
+        user: { select: { fullName: true, email: true, phone: true } },
+        services: { include: { service: true } },
+        schedules: { where: { isAvailable: true }, orderBy: { dayOfWeek: "asc" } },
+        clinic: { select: { name: true, phone: true, address: true, city: true } },
+      },
+    });
+  } catch (err) {
+    console.warn(`[CMS Service] Could not fetch doctor "${doctorId}" from DB:`, (err as Error).message);
+    return null;
+  }
 }
 
 /**
