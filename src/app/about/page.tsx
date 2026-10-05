@@ -60,14 +60,14 @@ export default async function AboutPage() {
                 {aboutParagraph}
               </p>
               <p className="text-sm text-slate-600 dark:text-slate-300 leading-relaxed">
-                Every consultation is conducted with unhurried clinical attention. Our practitioners synthesize traditional diagnostic modalities—including pulse examination, tongue evaluation, and constitutional profiling—with modern diagnostic markers to formulate your treatment roadmap.
+                Every consultation is conducted with unhurried clinical attention. Our medical specialists perform thorough examinations, review your complete medical profile, and utilize evidence-based diagnostic markers to formulate your personalized treatment roadmap.
               </p>
 
               <div className="grid grid-cols-2 gap-4 pt-2">
                 <div className="p-4 rounded-2xl bg-emerald-50/60 dark:bg-emerald-950/40 border border-emerald-100 dark:border-emerald-800/40">
-                  <h4 className="font-extrabold text-emerald-800 dark:text-emerald-300 text-sm">Authentic Formulations</h4>
+                  <h4 className="font-extrabold text-emerald-800 dark:text-emerald-300 text-sm">Clinical Diagnostics</h4>
                   <p className="text-xs text-slate-600 dark:text-slate-400 mt-1">
-                    Standardized, heavy-metal tested classical botanical preparations.
+                    Advanced health screening and evidence-based clinical protocols.
                   </p>
                 </div>
                 <div className="p-4 rounded-2xl bg-teal-50/60 dark:bg-teal-950/40 border border-teal-100 dark:border-teal-800/40">
