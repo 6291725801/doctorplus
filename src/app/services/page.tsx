@@ -3,6 +3,7 @@ import React from "react";
 import Link from "next/link";
 import { getPublicServices, generateCmsMetadata } from "@/lib/services/cms.service";
 import { PublicShell } from "@/components/layout/public-shell";
+import { getDepartmentMeta } from "@/lib/utils/department";
 
 export async function generateMetadata() {
   return generateCmsMetadata(
@@ -48,19 +49,29 @@ export default async function ServicesPage() {
             </div>
           ) : (
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-              {services.map((service) => (
+              {services.map((service) => {
+                const dept = getDepartmentMeta(service.name);
+
+                return (
                 <div
                   key={service.id}
                   className="rounded-3xl border border-slate-200/80 bg-white p-7 shadow-xs hover:shadow-xl transition-all duration-300 dark:bg-slate-900 dark:border-slate-800 flex flex-col justify-between hover:-translate-y-1"
                 >
                   <div>
                     <div className="flex items-start justify-between mb-4">
-                      <div className="h-14 w-14 rounded-2xl bg-emerald-50 dark:bg-emerald-950/60 flex items-center justify-center text-3xl text-emerald-600">
-                        {service.iconUrl ? (
-                          <img src={service.iconUrl} alt={service.name} className="h-8 w-8 object-contain" />
-                        ) : (
-                          "🌿"
-                        )}
+                      <div className="flex items-center gap-3">
+                        <div className={`h-14 w-14 rounded-2xl bg-gradient-to-tr ${dept.gradient} flex items-center justify-center text-3xl text-white shadow-md`}>
+                          {service.iconUrl ? (
+                            <img src={service.iconUrl} alt={service.name} className="h-8 w-8 object-contain" />
+                          ) : (
+                            <span>{dept.icon}</span>
+                          )}
+                        </div>
+                        <div>
+                          <span className={`inline-block px-2.5 py-0.5 rounded-full text-[10px] font-bold border ${dept.badgeClass}`}>
+                            {dept.department}
+                          </span>
+                        </div>
                       </div>
                       {service.isPopular && (
                         <span className="px-2.5 py-1 rounded-full text-[10px] font-bold bg-amber-100 text-amber-800 dark:bg-amber-950 dark:text-amber-300">
@@ -74,7 +85,7 @@ export default async function ServicesPage() {
                     </h2>
 
                     <p className="text-xs text-slate-600 dark:text-slate-400 mt-2.5 leading-relaxed line-clamp-3">
-                      {service.shortDescription || service.description || "Comprehensive clinical diagnosis and personalized treatment plan tailored to your body constitution."}
+                      {service.shortDescription || service.description || "Comprehensive clinical diagnosis, physical examination, and personalized medical treatment protocol."}
                     </p>
 
                     <div className="mt-4 pt-3 border-t border-slate-100 dark:border-slate-800 flex items-center gap-4 text-xs text-slate-500">
@@ -106,7 +117,8 @@ export default async function ServicesPage() {
                     </div>
                   </div>
                 </div>
-              ))}
+                );
+              })}
             </div>
           )}
         </div>

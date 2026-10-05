@@ -234,6 +234,7 @@ async function main() {
       advanceBookingFee: 100.0,
       appointmentDurationMinutes: 20,
       roomNumber: "Room 101",
+      profilePhotoUrl: "/images/doctors/dr-rohit-kumar.jpg",
       services: ["general-consultation", "full-body-health-checkup"],
       days: [
         DayOfWeek.MONDAY,
@@ -258,6 +259,7 @@ async function main() {
       advanceBookingFee: 150.0,
       appointmentDurationMinutes: 30,
       roomNumber: "Room 102",
+      profilePhotoUrl: "/images/doctors/dr-ananya-sharma.jpg",
       services: ["cardiology-consultation", "pediatric-consultation"],
       days: [
         DayOfWeek.MONDAY,
@@ -280,6 +282,7 @@ async function main() {
       advanceBookingFee: 100.0,
       appointmentDurationMinutes: 25,
       roomNumber: "Room 103",
+      profilePhotoUrl: "/images/doctors/dr-rajesh-verma.jpg",
       services: ["orthopedic-consultation"],
       days: [
         DayOfWeek.TUESDAY,
@@ -301,6 +304,7 @@ async function main() {
       advanceBookingFee: 100.0,
       appointmentDurationMinutes: 20,
       roomNumber: "Room 104",
+      profilePhotoUrl: "/images/doctors/dr-priya-patel.jpg",
       services: ["dermatology-consultation"],
       days: [
         DayOfWeek.MONDAY,
@@ -343,6 +347,7 @@ async function main() {
         advanceBookingFee: doc.advanceBookingFee,
         appointmentDurationMinutes: doc.appointmentDurationMinutes,
         roomNumber: doc.roomNumber,
+        profilePhotoUrl: doc.profilePhotoUrl,
         isActive: true,
         isAvailableForBooking: true,
       },
@@ -357,6 +362,7 @@ async function main() {
         advanceBookingFee: doc.advanceBookingFee,
         appointmentDurationMinutes: doc.appointmentDurationMinutes,
         roomNumber: doc.roomNumber,
+        profilePhotoUrl: doc.profilePhotoUrl,
         isActive: true,
         isAvailableForBooking: true,
       },

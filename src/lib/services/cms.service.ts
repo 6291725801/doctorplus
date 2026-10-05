@@ -151,7 +151,7 @@ export const DEFAULT_FALLBACK_DOCTORS = [
     advanceBookingFee: 100.0,
     appointmentDurationMinutes: 20,
     roomNumber: "Room 101",
-    profilePhotoUrl: null,
+    profilePhotoUrl: "/images/doctors/dr-rohit-kumar.jpg",
     isActive: true,
     isAvailableForBooking: true,
     user: {
@@ -182,7 +182,7 @@ export const DEFAULT_FALLBACK_DOCTORS = [
     advanceBookingFee: 150.0,
     appointmentDurationMinutes: 30,
     roomNumber: "Room 102",
-    profilePhotoUrl: null,
+    profilePhotoUrl: "/images/doctors/dr-ananya-sharma.jpg",
     isActive: true,
     isAvailableForBooking: true,
     user: {
@@ -211,7 +211,7 @@ export const DEFAULT_FALLBACK_DOCTORS = [
     advanceBookingFee: 100.0,
     appointmentDurationMinutes: 25,
     roomNumber: "Room 103",
-    profilePhotoUrl: null,
+    profilePhotoUrl: "/images/doctors/dr-rajesh-verma.jpg",
     isActive: true,
     isAvailableForBooking: true,
     user: {
@@ -238,7 +238,7 @@ export const DEFAULT_FALLBACK_DOCTORS = [
     advanceBookingFee: 100.0,
     appointmentDurationMinutes: 20,
     roomNumber: "Room 104",
-    profilePhotoUrl: null,
+    profilePhotoUrl: "/images/doctors/dr-priya-patel.jpg",
     isActive: true,
     isAvailableForBooking: true,
     user: {

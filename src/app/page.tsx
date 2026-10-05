@@ -3,6 +3,7 @@ import React from "react";
 import Link from "next/link";
 import { getHomepageData, generateCmsMetadata } from "@/lib/services/cms.service";
 import { PublicShell } from "@/components/layout/public-shell";
+import { getDepartmentMeta } from "@/lib/utils/department";
 
 export const dynamic = "force-dynamic";
 export const revalidate = 0;
@@ -220,14 +221,22 @@ export default async function HomePage() {
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-            {services.map((srv) => (
+            {services.map((srv) => {
+              const dept = getDepartmentMeta(srv.name);
+
+              return (
               <div
                 key={srv.id}
                 className="group relative rounded-3xl border border-slate-200/80 bg-slate-50/50 p-7 shadow-xs hover:shadow-xl transition-all duration-300 dark:bg-slate-800/40 dark:border-slate-800 flex flex-col justify-between hover:-translate-y-1 hover:border-emerald-500/50"
               >
                 <div>
-                  <div className="h-12 w-12 rounded-2xl bg-emerald-100 dark:bg-emerald-950/60 flex items-center justify-center text-2xl text-emerald-700 dark:text-emerald-400 mb-5 group-hover:scale-110 transition">
-                    🌿
+                  <div className="flex items-center justify-between mb-5">
+                    <div className={`h-12 w-12 rounded-2xl bg-gradient-to-tr ${dept.gradient} flex items-center justify-center text-2xl text-white shadow-md group-hover:scale-110 transition`}>
+                      {dept.icon}
+                    </div>
+                    <span className={`px-2.5 py-0.5 rounded-full text-[10px] font-bold border ${dept.badgeClass}`}>
+                      {dept.department}
+                    </span>
                   </div>
                   <h3 className="text-lg font-bold text-slate-900 dark:text-white group-hover:text-emerald-600 transition">
                     {srv.name}
@@ -252,7 +261,8 @@ export default async function HomePage() {
                   </Link>
                 </div>
               </div>
-            ))}
+              );
+            })}
           </div>
         </div>
       </section>
