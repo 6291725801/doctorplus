@@ -23,56 +23,111 @@ export interface SectionConfig {
   isVisible: boolean;
 }
 
+const DEFAULT_FALLBACK_CLINIC = {
+  id: "default-clinic-id",
+  name: "Doctor Plus",
+  slug: "doctorplus",
+  description: "Advanced Healthcare & Specialized Clinical Services",
+  email: "care@doctorplus.com",
+  phone: "+91 98765 43210",
+  address: "123 Health Boulevard, Medical Enclave",
+  city: "Kolkata",
+  state: "West Bengal",
+  postalCode: "700001",
+  country: "India",
+  isActive: true,
+  createdAt: new Date(),
+  updatedAt: new Date(),
+  settings: {
+    id: "default-settings",
+    clinicId: "default-clinic-id",
+    minAdvanceAmount: 100,
+    defaultSlotDurationMinutes: 15,
+    maxAdvanceBookingDays: 30,
+    cancellationCutoffHours: 2,
+    currency: "INR",
+    timezone: "Asia/Kolkata",
+    openingTime: "09:00",
+    closingTime: "20:00",
+    enableOnlinePayment: true,
+  },
+  siteSettings: {
+    id: "default-sitesettings",
+    clinicId: "default-clinic-id",
+    siteTitle: "Doctor Plus — Healthcare & Clinic Platform",
+    tagline: "Advanced Healthcare & Specialized Clinical Services",
+    metaDescription: "Book appointments with experienced doctors and healthcare specialists.",
+    logoUrl: "/doctor-plus-icon.svg",
+    faviconUrl: "/doctor-plus-icon.svg",
+    primaryColor: "#0D9488",
+    secondaryColor: "#0F766E",
+    accentColor: "#F59E0B",
+    contactEmail: "care@doctorplus.com",
+    contactPhone: "+91 98765 43210",
+    whatsappNumber: "+919876543210",
+    address: "123 Health Boulevard, Medical Enclave",
+    mapEmbedUrl: "https://maps.google.com/maps?q=Keutia,+Bhatpara,+Kolkata+743126&t=&z=15&ie=UTF8&iwloc=&output=embed",
+  },
+};
+
 /**
  * Retrieves the active clinic record with its settings.
  */
 export async function getActiveClinic() {
-  const clinic = await prisma.clinic.findFirst({
-    where: { isActive: true, slug: { not: "test-clinic-tenant-b" } },
-    orderBy: { createdAt: "asc" },
-    include: {
-      settings: true,
-      siteSettings: true,
-    },
-  });
+  try {
+    const clinic = await prisma.clinic.findFirst({
+      where: { isActive: true, slug: { not: "test-clinic-tenant-b" } },
+      orderBy: { createdAt: "asc" },
+      include: {
+        settings: true,
+        siteSettings: true,
+      },
+    });
 
-  if (!clinic) {
-    throw new AppError("No active clinic found.", 404, "CLINIC_NOT_FOUND");
+    if (clinic) return clinic;
+  } catch (err: any) {
+    console.warn("[CMS Service] Could not connect to database in getActiveClinic. Using default clinic fallback.");
   }
 
-  return clinic;
+  return DEFAULT_FALLBACK_CLINIC as any;
 }
 
 /**
  * Retrieves global site settings for public display and dynamic theming.
  */
 export async function getSiteSettings(clinicId?: string) {
-  let targetClinicId = clinicId;
+  try {
+    let targetClinicId = clinicId;
 
-  if (!targetClinicId) {
-    const active = await getActiveClinic();
-    targetClinicId = active.id;
-  }
+    if (!targetClinicId) {
+      const active = await getActiveClinic();
+      targetClinicId = active.id;
+    }
 
-  const settings = await prisma.siteSettings.findUnique({
-    where: { clinicId: targetClinicId },
-    include: {
-      clinic: {
-        select: {
-          id: true,
-          name: true,
-          slug: true,
-          email: true,
-          phone: true,
-          address: true,
-          city: true,
-          state: true,
+    const settings = await prisma.siteSettings.findUnique({
+      where: { clinicId: targetClinicId },
+      include: {
+        clinic: {
+          select: {
+            id: true,
+            name: true,
+            slug: true,
+            email: true,
+            phone: true,
+            address: true,
+            city: true,
+            state: true,
+          },
         },
       },
-    },
-  });
+    });
 
-  return settings;
+    if (settings) return settings;
+  } catch (err: any) {
+    console.warn("[CMS Service] Could not fetch site settings from DB. Using fallback.");
+  }
+
+  return DEFAULT_FALLBACK_CLINIC.siteSettings as any;
 }
 
 /**
@@ -135,49 +190,68 @@ export async function updateSiteSettings(
  * Retrieves the complete homepage layout with all sections.
  */
 export async function getHomepageData(clinicId?: string) {
-  const clinic = await getActiveClinic();
-  const targetClinicId = clinicId || clinic.id;
+  try {
+    const clinic = await getActiveClinic();
+    const targetClinicId = clinicId || clinic.id;
 
-  const page = await prisma.page.findUnique({
-    where: {
-      clinicId_slug: {
-        clinicId: targetClinicId,
-        slug: "home",
-      },
-    },
-    include: {
-      sections: {
+    const page = await prisma.page
+      .findUnique({
+        where: {
+          clinicId_slug: {
+            clinicId: targetClinicId,
+            slug: "home",
+          },
+        },
+        include: {
+          sections: {
+            orderBy: { sortOrder: "asc" },
+          },
+        },
+      })
+      .catch(() => null);
+
+    // Services list
+    const services = await prisma.service
+      .findMany({
+        where: { clinicId: targetClinicId, isActive: true },
         orderBy: { sortOrder: "asc" },
-      },
-    },
-  });
+        take: 6,
+      })
+      .catch(() => []);
 
-  // Services list
-  const services = await prisma.service.findMany({
-    where: { clinicId: targetClinicId, isActive: true },
-    orderBy: { sortOrder: "asc" },
-    take: 6,
-  });
+    // Doctors list
+    const doctors = await prisma.doctor
+      .findMany({
+        where: { clinicId: targetClinicId, isActive: true },
+        include: {
+          user: {
+            select: { fullName: true, email: true },
+          },
+        },
+      })
+      .catch(() => []);
 
-  // Doctors list
-  const doctors = await prisma.doctor.findMany({
-    where: { clinicId: targetClinicId, isActive: true },
-    include: {
-      user: {
-        select: { fullName: true, email: true },
-      },
-    },
-  });
-
-  return {
-    clinic,
-    siteSettings: clinic.siteSettings,
-    clinicSettings: clinic.settings,
-    page,
-    sections: page?.sections || [],
-    services,
-    doctors,
-  };
+    return {
+      clinic,
+      siteSettings: clinic.siteSettings,
+      clinicSettings: clinic.settings,
+      page,
+      sections: page?.sections || [],
+      services,
+      doctors,
+    };
+  } catch (err: any) {
+    console.warn("[CMS Service] Error getting homepage data from DB. Using fallback.");
+    return {
+      clinic: DEFAULT_FALLBACK_CLINIC as any,
+      siteSettings: DEFAULT_FALLBACK_CLINIC.siteSettings as any,
+      clinicSettings: DEFAULT_FALLBACK_CLINIC.settings as any,
+      page: null,
+      sections: [],
+      services: [],
+      doctors: [],
+    };
+  }
 }
 
 /**

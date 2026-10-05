@@ -1,7 +1,7 @@
 import React from "react";
 import { prisma } from "@/lib/db";
 import { PublicShell } from "@/components/layout/public-shell";
-import { generateCmsMetadata } from "@/lib/services/cms.service";
+import { getActiveClinic, generateCmsMetadata } from "@/lib/services/cms.service";
 import { ContactForm } from "@/components/public/contact-form";
 import Link from "next/link";
 import { Metadata } from "next";
@@ -15,10 +15,7 @@ export async function generateMetadata(): Promise<Metadata> {
 }
 
 export default async function ContactPage() {
-  const clinic = await prisma.clinic.findFirst({
-    where: { isActive: true },
-    include: { siteSettings: true, settings: true },
-  });
+  const clinic = await getActiveClinic();
 
   const phone = clinic?.siteSettings?.contactPhone || clinic?.phone || "+91 98765 43210";
   const email = clinic?.siteSettings?.contactEmail || clinic?.email || "helpdesk@clinic.com";

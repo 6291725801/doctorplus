@@ -14,6 +14,9 @@ const geistMono = Geist_Mono({
 
 import { getSiteSettings } from "@/lib/services/cms.service";
 
+export const dynamic = "force-dynamic";
+export const revalidate = 0;
+
 export async function generateMetadata(): Promise<Metadata> {
   try {
     const settings = await getSiteSettings();

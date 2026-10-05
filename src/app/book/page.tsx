@@ -7,6 +7,8 @@ import { generateCmsMetadata } from "@/lib/services/cms.service";
 import Link from "next/link";
 import { Metadata } from "next";
 
+export const dynamic = "force-dynamic";
+
 export async function generateMetadata(): Promise<Metadata> {
   return generateCmsMetadata(
     "book",
@@ -25,27 +27,39 @@ export default async function BookAppointmentPage(props: BookAppointmentPageProp
     props.searchParams ? props.searchParams : Promise.resolve({} as { doctorId?: string; serviceId?: string }),
   ]);
 
-  const [doctors, services, clinic] = await Promise.all([
-    prisma.doctor.findMany({
-      where: {
-        isActive: true,
-        isAvailableForBooking: true,
-        clinic: { isActive: true },
-      },
-      include: {
-        user: { select: { fullName: true, email: true } },
-      },
-      orderBy: { createdAt: "asc" },
-    }),
-    prisma.service.findMany({
-      where: { isActive: true, clinic: { isActive: true } },
-      orderBy: { sortOrder: "asc" },
-    }),
-    prisma.clinic.findFirst({
-      where: { isActive: true },
-      select: { name: true, phone: true, email: true },
-    }),
-  ]);
+  let doctors: any[] = [];
+  let services: any[] = [];
+  let clinic: any = null;
+
+  try {
+    const results = await Promise.all([
+      prisma.doctor.findMany({
+        where: {
+          isActive: true,
+          isAvailableForBooking: true,
+          clinic: { isActive: true },
+        },
+        include: {
+          user: { select: { fullName: true, email: true } },
+        },
+        orderBy: { createdAt: "asc" },
+      }),
+      prisma.service.findMany({
+        where: { isActive: true, clinic: { isActive: true } },
+        orderBy: { sortOrder: "asc" },
+      }),
+      prisma.clinic.findFirst({
+        where: { isActive: true },
+        select: { name: true, phone: true, email: true },
+      }),
+    ]);
+    doctors = results[0];
+    services = results[1];
+    clinic = results[2];
+  } catch (err) {
+    console.warn("Database connection error in BookAppointmentPage, using fallback:", err);
+    clinic = { name: "Doctor Plus", phone: "+91 98765 43210", email: "care@doctorplus.com" };
+  }
 
   const serializedDoctors = doctors.map((d) => ({
     id: d.id,

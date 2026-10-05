@@ -4,6 +4,9 @@ import Link from "next/link";
 import { getHomepageData, generateCmsMetadata } from "@/lib/services/cms.service";
 import { PublicShell } from "@/components/layout/public-shell";
 
+export const dynamic = "force-dynamic";
+export const revalidate = 0;
+
 export async function generateMetadata() {
   return generateCmsMetadata(
     "home",

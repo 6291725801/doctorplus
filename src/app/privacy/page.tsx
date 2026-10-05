@@ -1,7 +1,7 @@
 import React from "react";
 import { prisma } from "@/lib/db";
 import { PublicShell } from "@/components/layout/public-shell";
-import { generateCmsMetadata } from "@/lib/services/cms.service";
+import { getActiveClinic, generateCmsMetadata } from "@/lib/services/cms.service";
 import { Metadata } from "next";
 
 export async function generateMetadata(): Promise<Metadata> {
@@ -13,10 +13,7 @@ export async function generateMetadata(): Promise<Metadata> {
 }
 
 export default async function PrivacyPolicyPage() {
-  const clinic = await prisma.clinic.findFirst({
-    where: { isActive: true },
-    select: { name: true, email: true, phone: true, address: true },
-  });
+  const clinic = await getActiveClinic();
 
   return (
     <PublicShell>

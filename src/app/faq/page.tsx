@@ -1,7 +1,7 @@
 import React from "react";
 import { prisma } from "@/lib/db";
 import { PublicShell } from "@/components/layout/public-shell";
-import { generateCmsMetadata } from "@/lib/services/cms.service";
+import { getActiveClinic, generateCmsMetadata } from "@/lib/services/cms.service";
 import { FAQAccordion } from "@/components/public/faq-accordion";
 import Link from "next/link";
 import { Metadata } from "next";
@@ -54,10 +54,7 @@ const DEFAULT_FAQS = [
 ];
 
 export default async function FAQPage() {
-  const clinic = await prisma.clinic.findFirst({
-    where: { isActive: true },
-    select: { id: true, name: true, phone: true },
-  });
+  const clinic = await getActiveClinic();
 
   const faqs = DEFAULT_FAQS;
 
