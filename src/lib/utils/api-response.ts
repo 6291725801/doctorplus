@@ -121,6 +121,17 @@ export function handleApiError(error: unknown): NextResponse<ApiErrorResponse> {
     );
   }
 
+  if (
+    error instanceof Prisma.PrismaClientInitializationError ||
+    (error instanceof Error && error.message.includes("Can't reach database server"))
+  ) {
+    return errorResponse(
+      "Database connection failed. Please ensure PostgreSQL or local database is running (run 'npm run dev' or 'npm run db:start').",
+      "DATABASE_UNAVAILABLE",
+      503
+    );
+  }
+
   // Standard Error
   if (error instanceof Error) {
     return errorResponse(
