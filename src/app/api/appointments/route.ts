@@ -86,6 +86,8 @@ export async function POST(request: NextRequest) {
       patientDetails,
       symptoms,
       patientNotes,
+      paymentMethod,
+      upiTransactionId,
     } = body;
 
     if (!doctorId || !appointmentDate || !appointmentTime) {
@@ -122,6 +124,8 @@ export async function POST(request: NextRequest) {
         patientDetails,
         symptoms,
         patientNotes,
+        paymentMethod: paymentMethod || (upiTransactionId ? "UPI" : undefined),
+        upiTransactionId,
       },
       session?.userId
     );

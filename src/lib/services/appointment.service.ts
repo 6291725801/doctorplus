@@ -25,6 +25,8 @@ export interface BookAppointmentInput {
   };
   symptoms?: string;
   patientNotes?: string;
+  paymentMethod?: "UPI" | "ONLINE" | "CASH";
+  upiTransactionId?: string;
 }
 
 export interface ListAppointmentsFilter {
@@ -319,6 +321,13 @@ export async function bookAppointment(input: BookAppointmentInput, actorUserId?:
     // 12. Create Appointment
     const appointmentNumber = generateAppointmentNumber();
 
+    const isUpiPayment = input.paymentMethod === "UPI" || !!input.upiTransactionId;
+    const isPaidFull = advanceAmount >= consultationFee;
+    const initialPaymentStatus = isUpiPayment
+      ? (isPaidFull ? "PAID" : "PARTIALLY_PAID")
+      : "PENDING";
+    const paymentDateStr = new Date().toISOString().slice(0, 10).replace(/-/g, "");
+
     const created = await tx.appointment.create({
       data: {
         appointmentNumber,
@@ -333,10 +342,37 @@ export async function bookAppointment(input: BookAppointmentInput, actorUserId?:
         status: AppointmentStatus.CONFIRMED,
         consultationFee,
         advanceAmount,
-        balanceAmount,
-        paymentStatus: "PENDING",
+        balanceAmount: isPaidFull ? 0 : balanceAmount,
+        paymentStatus: initialPaymentStatus,
         symptoms: input.symptoms?.trim() || null,
         patientNotes: input.patientNotes?.trim() || null,
+        ...(isUpiPayment
+          ? {
+              payments: {
+                create: {
+                  paymentReference: `PAY-${paymentDateStr}-${Math.random().toString(36).substring(2, 7).toUpperCase()}`,
+                  amount: advanceAmount,
+                  currency: "INR",
+                  status: "PAID",
+                  method: "UPI",
+                  gatewayProvider: "UPI_QR",
+                  gatewayPaymentId: input.upiTransactionId?.trim() || "UPI_CONFIRMED",
+                  notes: `UPI Payment via QR Code (UTR: ${input.upiTransactionId?.trim() || "N/A"}) - Payee: Rohit Kumar (6291725801@superyes)`,
+                  paidAt: new Date(),
+                  attempts: {
+                    create: {
+                      attemptNumber: 1,
+                      status: "PAID",
+                      amount: advanceAmount,
+                      currency: "INR",
+                      gatewayProvider: "UPI_QR",
+                      gatewayPaymentId: input.upiTransactionId?.trim() || "UPI_CONFIRMED",
+                    },
+                  },
+                },
+              },
+            }
+          : {}),
       },
       include: {
         doctor: {
@@ -350,6 +386,7 @@ export async function bookAppointment(input: BookAppointmentInput, actorUserId?:
           },
         },
         service: true,
+        payments: true,
       },
     });
 

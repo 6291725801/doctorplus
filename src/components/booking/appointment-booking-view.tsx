@@ -7,6 +7,7 @@ import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardHeader, CardTitle, CardDescription, CardContent } from "@/components/ui/card";
 import { AppointmentType } from "@prisma/client";
+import { Copy, Check, QrCode, Smartphone, ShieldCheck, AlertCircle, Ban } from "lucide-react";
 
 export interface BookingDoctor {
   id: string;
@@ -62,6 +63,10 @@ interface AppointmentBookingViewProps {
   onSuccess?: (appointment: Record<string, unknown>) => void;
 }
 
+const UPI_ID = "6291725801@superyes";
+const UPI_PAYEE_NAME = "Rohit Kumar";
+const UPI_QR_IMAGE = "/images/upi-qr.png";
+
 export function AppointmentBookingView({
   doctors,
   services = [],
@@ -78,7 +83,7 @@ export function AppointmentBookingView({
   // 2. Service selection (optional)
   const [selectedServiceId, setSelectedServiceId] = useState<string>(initialServiceId || "");
 
-  // 3. Date selection (defaults to today or tomorrow in YYYY-MM-DD)
+  // 3. Date selection (defaults to tomorrow in YYYY-MM-DD)
   const getTomorrowStr = () => {
     const d = new Date();
     d.setDate(d.getDate() + 1);
@@ -101,7 +106,12 @@ export function AppointmentBookingView({
   const [symptoms, setSymptoms] = useState("");
   const [patientNotes, setPatientNotes] = useState("");
 
-  // 7. Booking status state
+  // 7. UPI Payment state (Mandatory - No COD)
+  const [upiTransactionId, setUpiTransactionId] = useState("");
+  const [upiPaidConfirmed, setUpiPaidConfirmed] = useState(false);
+  const [copiedUpi, setCopiedUpi] = useState(false);
+
+  // 8. Booking status state
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [bookingSuccess, setBookingSuccess] = useState<Record<string, unknown> | null>(null);
@@ -113,6 +123,21 @@ export function AppointmentBookingView({
   const consultationFee = selectedService ? selectedService.fee : (selectedDoctor?.consultationFee || 500);
   const advanceAmount = selectedDoctor?.advanceBookingFee || 100;
   const balanceAmount = Math.max(0, consultationFee - advanceAmount);
+
+  // Deep-link for mobile UPI applications
+  const upiIntentUrl = `upi://pay?pa=${encodeURIComponent(UPI_ID)}&pn=${encodeURIComponent(
+    UPI_PAYEE_NAME
+  )}&am=${advanceAmount}&cu=INR&tn=${encodeURIComponent(
+    `Clinic Slot Advance ${selectedDate}`
+  )}`;
+
+  const handleCopyUpi = () => {
+    if (typeof navigator !== "undefined" && navigator.clipboard) {
+      navigator.clipboard.writeText(UPI_ID);
+      setCopiedUpi(true);
+      setTimeout(() => setCopiedUpi(false), 2500);
+    }
+  };
 
   // Fetch slots whenever doctor or date changes
   useEffect(() => {
@@ -163,6 +188,20 @@ export function AppointmentBookingView({
       return;
     }
 
+    if (!upiTransactionId.trim()) {
+      setError(
+        "Please complete the advance payment of ₹" +
+          advanceAmount +
+          " via UPI QR code and enter the 12-digit UPI Reference / UTR Number."
+      );
+      return;
+    }
+
+    if (!upiPaidConfirmed) {
+      setError("Please check the confirmation box verifying that you have completed the UPI payment.");
+      return;
+    }
+
     setSubmitting(true);
     setError(null);
 
@@ -183,6 +222,8 @@ export function AppointmentBookingView({
           },
           symptoms: symptoms.trim() || undefined,
           patientNotes: patientNotes.trim() || undefined,
+          paymentMethod: "UPI",
+          upiTransactionId: upiTransactionId.trim(),
         }),
       });
 
@@ -209,14 +250,14 @@ export function AppointmentBookingView({
     return (
       <Card className="max-w-2xl mx-auto border-emerald-500/30 bg-emerald-50/20 dark:bg-emerald-950/20 shadow-xl">
         <CardHeader className="text-center pb-2">
-          <div className="mx-auto w-12 h-12 rounded-full bg-emerald-100 dark:bg-emerald-900/60 flex items-center justify-center text-emerald-600 dark:text-emerald-300 text-2xl font-bold mb-2">
-            ✓
+          <div className="mx-auto w-14 h-14 rounded-full bg-emerald-100 dark:bg-emerald-900/60 flex items-center justify-center text-emerald-600 dark:text-emerald-300 mb-2">
+            <Check className="w-8 h-8 stroke-[3]" />
           </div>
           <CardTitle className="text-2xl font-extrabold text-emerald-800 dark:text-emerald-200">
-            Appointment Confirmed!
+            Slot Booked & Advance Received!
           </CardTitle>
           <CardDescription>
-            Your appointment has been registered with the clinic. A confirmation has been generated.
+            Your appointment has been registered with the clinic. Your UPI payment proof has been linked.
           </CardDescription>
         </CardHeader>
         <CardContent className="space-y-6 pt-4">
@@ -238,38 +279,46 @@ export function AppointmentBookingView({
                 </p>
               </div>
               <div>
-                <p className="text-slate-400 font-medium">Consultation Date & Time</p>
+                <p className="text-slate-400 font-medium">Date & Time</p>
                 <p className="font-bold text-slate-800 dark:text-slate-200 mt-0.5">
                   {String(bookingSuccess.appointmentDate).slice(0, 10)} at {String(bookingSuccess.appointmentTime)}
                 </p>
               </div>
               <div>
-                <p className="text-slate-400 font-medium">Appointment Type</p>
-                <p className="font-bold text-slate-800 dark:text-slate-200 mt-0.5">
-                  {String(bookingSuccess.appointmentType).replace(/_/g, " ")}
-                </p>
+                <p className="text-slate-400 font-medium">Payment Mode</p>
+                <div className="mt-0.5 flex items-center gap-1 font-bold text-emerald-700 dark:text-emerald-300">
+                  <QrCode className="w-3.5 h-3.5 text-teal-600" />
+                  <span>UPI (QR Code)</span>
+                </div>
               </div>
               <div>
-                <p className="text-slate-400 font-medium">Status</p>
-                <Badge variant="emerald" className="mt-0.5">
-                  {String(bookingSuccess.status)}
-                </Badge>
+                <p className="text-slate-400 font-medium">UPI Ref / UTR</p>
+                <p className="font-mono font-bold text-slate-900 dark:text-white mt-0.5 truncate">
+                  {upiTransactionId || "Recorded"}
+                </p>
               </div>
             </div>
 
             <div className="pt-3 border-t border-slate-100 dark:border-slate-800 flex justify-between items-center text-xs">
               <div>
-                <span className="text-slate-500">Advance Due/Paid: </span>
-                <span className="font-bold text-slate-900 dark:text-white">
-                  ₹{Number(bookingSuccess.advanceAmount).toFixed(2)}
+                <span className="text-slate-500">Advance Paid via UPI: </span>
+                <span className="font-bold text-emerald-600 dark:text-emerald-400">
+                  ₹{Number(bookingSuccess.advanceAmount || advanceAmount).toFixed(2)} ✓
                 </span>
               </div>
               <div>
-                <span className="text-slate-500">Balance at Clinic: </span>
-                <span className="font-bold text-emerald-600 dark:text-emerald-400">
-                  ₹{Number(bookingSuccess.balanceAmount).toFixed(2)}
+                <span className="text-slate-500">Remaining Balance: </span>
+                <span className="font-bold text-slate-900 dark:text-white">
+                  ₹{Number(bookingSuccess.balanceAmount || balanceAmount).toFixed(2)}
                 </span>
               </div>
+            </div>
+
+            <div className="p-3 bg-emerald-50 dark:bg-emerald-950/40 rounded-xl text-[11px] text-emerald-800 dark:text-emerald-200 flex items-center gap-2">
+              <ShieldCheck className="w-4 h-4 text-emerald-600 shrink-0" />
+              <span>
+                Payment received for Payee <strong>{UPI_PAYEE_NAME}</strong> ({UPI_ID}). Clinic reception will verify the UTR upon arrival.
+              </span>
             </div>
           </div>
 
@@ -279,6 +328,8 @@ export function AppointmentBookingView({
               onClick={() => {
                 setBookingSuccess(null);
                 setSelectedTime("");
+                setUpiTransactionId("");
+                setUpiPaidConfirmed(false);
               }}
             >
               Book Another Appointment
@@ -294,15 +345,33 @@ export function AppointmentBookingView({
 
   return (
     <form onSubmit={handleBook} className="max-w-4xl mx-auto space-y-6">
+      {/* NO COD WARNING BANNER */}
+      <div className="p-3.5 rounded-2xl bg-amber-50 dark:bg-amber-950/40 border border-amber-300 dark:border-amber-700/60 flex items-center justify-between gap-3 text-amber-900 dark:text-amber-100 text-xs">
+        <div className="flex items-center gap-2.5">
+          <div className="w-7 h-7 rounded-full bg-amber-200 dark:bg-amber-900 flex items-center justify-center shrink-0">
+            <Ban className="w-4 h-4 text-amber-800 dark:text-amber-200" />
+          </div>
+          <div>
+            <p className="font-bold">Important: Cash on Delivery (COD) / Pay-at-Clinic Not Available</p>
+            <p className="text-[11px] opacity-90">
+              Slot reservation requires mandatory advance payment via <strong>UPI QR Code</strong> to prevent fake bookings and confirm doctor availability.
+            </p>
+          </div>
+        </div>
+        <Badge variant="outline" className="hidden sm:inline-flex bg-white dark:bg-slate-900 border-amber-400 font-bold shrink-0">
+          UPI Only
+        </Badge>
+      </div>
+
       {error && (
         <div className="p-4 rounded-xl bg-rose-50 dark:bg-rose-950/40 border border-rose-200 dark:border-rose-800 text-rose-700 dark:text-rose-300 text-sm flex items-start gap-2">
-          <span>⚠️</span>
+          <AlertCircle className="w-5 h-5 text-rose-500 shrink-0 mt-0.5" />
           <span>{error}</span>
         </div>
       )}
 
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-        {/* LEFT COLUMN: SELECTION (Doctor, Service, Date, Type) */}
+        {/* LEFT COLUMN: SELECTIONS & UPI QR PAYMENT */}
         <div className="md:col-span-2 space-y-6">
           {/* STEP 1: SELECT DOCTOR */}
           <Card>
@@ -387,7 +456,7 @@ export function AppointmentBookingView({
                 <span className="w-6 h-6 rounded-full bg-teal-100 dark:bg-teal-900/60 text-teal-700 dark:text-teal-300 text-xs flex items-center justify-center font-bold">
                   2
                 </span>
-                Consultation Date & Live Slot Availability
+                Consultation Date & Slot Availability
               </CardTitle>
               <CardDescription>
                 Live schedule engine calculated directly from PostgreSQL doctor timings and bookings.
@@ -558,7 +627,7 @@ export function AppointmentBookingView({
                   rows={2}
                   value={symptoms}
                   onChange={(e) => setSymptoms(e.target.value)}
-                  placeholder="e.g. Chronic digestive discomfort, joint pain, migraine (optional)..."
+                  placeholder="e.g. Fever, digestive issues, joint pain, migraine (optional)..."
                   className="w-full text-xs rounded-xl border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-900 p-2.5 text-slate-900 dark:text-white"
                 />
               </div>
@@ -576,6 +645,144 @@ export function AppointmentBookingView({
               </div>
             </CardContent>
           </Card>
+
+          {/* STEP 4: MANDATORY UPI & QR CODE PAYMENT (NO COD) */}
+          <Card className="border-teal-500/30 bg-linear-to-b from-teal-50/30 via-white to-transparent dark:from-teal-950/30 dark:via-slate-900 shadow-md">
+            <CardHeader className="pb-3 border-b border-teal-100 dark:border-teal-900/40">
+              <div className="flex items-center justify-between flex-wrap gap-2">
+                <CardTitle className="text-base flex items-center gap-2">
+                  <span className="w-6 h-6 rounded-full bg-teal-600 text-white text-xs flex items-center justify-center font-bold">
+                    4
+                  </span>
+                  Pay Advance Deposit via UPI QR Code
+                </CardTitle>
+                <Badge variant="emerald" className="text-[11px] font-bold">
+                  ⚡ Instant Slot Lock
+                </Badge>
+              </div>
+              <CardDescription className="text-xs">
+                Scan the official clinic QR code below or transfer to the UPI ID. Cash on Delivery (COD) is disabled to avoid fake bookings.
+              </CardDescription>
+            </CardHeader>
+            <CardContent className="space-y-5 pt-4">
+              {/* QR CODE & PAYEE INFO CONTAINER */}
+              <div className="p-4 sm:p-5 rounded-2xl bg-white dark:bg-slate-950 border border-slate-200 dark:border-slate-800 flex flex-col sm:flex-row items-center gap-6 shadow-xs">
+                {/* QR CODE IMAGE */}
+                <div className="relative group shrink-0">
+                  <div className="w-48 h-56 p-2 rounded-2xl bg-white border-2 border-teal-500/40 shadow-sm flex flex-col items-center justify-center">
+                    <img
+                      src={UPI_QR_IMAGE}
+                      alt={`UPI QR Code - ${UPI_PAYEE_NAME}`}
+                      className="w-full h-auto object-contain rounded-xl"
+                    />
+                    <p className="text-[10px] font-bold text-slate-700 mt-1">Scan with any UPI App</p>
+                  </div>
+                </div>
+
+                {/* PAYEE DETAILS & ACTIONS */}
+                <div className="space-y-3.5 flex-1 w-full text-center sm:text-left">
+                  <div>
+                    <span className="text-[11px] uppercase tracking-wider text-slate-400 font-bold">
+                      Verified Payee Name
+                    </span>
+                    <p className="text-base font-extrabold text-slate-900 dark:text-white flex items-center justify-center sm:justify-start gap-1.5 mt-0.5">
+                      <span>{UPI_PAYEE_NAME}</span>
+                      <ShieldCheck className="w-4 h-4 text-teal-600 dark:text-teal-400" />
+                    </p>
+                  </div>
+
+                  <div>
+                    <span className="text-[11px] uppercase tracking-wider text-slate-400 font-bold">
+                      UPI ID
+                    </span>
+                    <div className="mt-1 flex items-center justify-center sm:justify-start gap-2">
+                      <code className="px-3 py-1.5 rounded-xl bg-slate-100 dark:bg-slate-800 font-mono text-xs sm:text-sm font-bold text-teal-700 dark:text-teal-300 border border-slate-200 dark:border-slate-700">
+                        {UPI_ID}
+                      </code>
+                      <Button
+                        type="button"
+                        size="sm"
+                        variant="outline"
+                        onClick={handleCopyUpi}
+                        className="h-8 text-xs font-semibold gap-1.5"
+                      >
+                        {copiedUpi ? (
+                          <>
+                            <Check className="w-3.5 h-3.5 text-emerald-600" />
+                            <span>Copied!</span>
+                          </>
+                        ) : (
+                          <>
+                            <Copy className="w-3.5 h-3.5" />
+                            <span>Copy</span>
+                          </>
+                        )}
+                      </Button>
+                    </div>
+                  </div>
+
+                  <div className="pt-1">
+                    <div className="inline-block px-3 py-1.5 rounded-xl bg-teal-50 dark:bg-teal-950/50 border border-teal-200 dark:border-teal-800 text-xs">
+                      <span className="text-slate-600 dark:text-slate-400">Advance Amount to Pay: </span>
+                      <strong className="text-teal-700 dark:text-teal-300 font-extrabold text-sm">
+                        ₹{advanceAmount.toFixed(0)}
+                      </strong>
+                    </div>
+                  </div>
+
+                  {/* MOBILE QUICK INTENT BUTTON */}
+                  <div className="pt-1 block sm:hidden">
+                    <a
+                      href={upiIntentUrl}
+                      className="w-full inline-flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl bg-teal-600 text-white font-bold text-xs shadow-md active:scale-98 transition"
+                    >
+                      <Smartphone className="w-4 h-4" />
+                      <span>Open UPI App (GPay / PhonePe / Paytm)</span>
+                    </a>
+                  </div>
+                </div>
+              </div>
+
+              {/* UTR / TRANSACTION ID INPUT */}
+              <div className="space-y-3 p-4 rounded-2xl bg-teal-50/50 dark:bg-teal-950/20 border border-teal-200 dark:border-teal-900/50">
+                <div>
+                  <label className="text-xs font-bold text-slate-800 dark:text-slate-200 mb-1 flex items-center justify-between">
+                    <span>UPI Reference / UTR Number (12 Digits) *</span>
+                    <span className="text-[10px] text-teal-700 dark:text-teal-300 font-normal">
+                      Required for instant slot confirmation
+                    </span>
+                  </label>
+                  <Input
+                    required
+                    value={upiTransactionId}
+                    onChange={(e) => setUpiTransactionId(e.target.value)}
+                    placeholder="Enter 12-digit UTR (e.g. 428912345678)"
+                    className="font-mono text-sm bg-white dark:bg-slate-900 border-teal-300 dark:border-teal-800"
+                  />
+                  <p className="text-[11px] text-slate-500 dark:text-slate-400 mt-1">
+                    💡 <em>Tip:</em> After completing the payment in GPay, PhonePe, or Paytm, open transaction history to copy the 12-digit UTR/UPI Ref ID.
+                  </p>
+                </div>
+
+                <div className="flex items-start gap-2 pt-1">
+                  <input
+                    type="checkbox"
+                    id="upiConfirmation"
+                    checked={upiPaidConfirmed}
+                    onChange={(e) => setUpiPaidConfirmed(e.target.checked)}
+                    className="mt-0.5 rounded text-teal-600 focus:ring-teal-500 cursor-pointer"
+                  />
+                  <label
+                    htmlFor="upiConfirmation"
+                    className="text-xs text-slate-700 dark:text-slate-300 font-medium cursor-pointer"
+                  >
+                    I confirm that I have transferred ₹{advanceAmount.toFixed(0)} to{" "}
+                    <strong>{UPI_PAYEE_NAME}</strong> ({UPI_ID}) via UPI.
+                  </label>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
         </div>
 
         {/* RIGHT COLUMN: PATIENT INFO & TRANSPARENT FEE BREAKDOWN */}
@@ -585,7 +792,7 @@ export function AppointmentBookingView({
             <CardHeader className="pb-3">
               <CardTitle className="text-base flex items-center gap-2">
                 <span className="w-6 h-6 rounded-full bg-teal-100 dark:bg-teal-900/60 text-teal-700 dark:text-teal-300 text-xs flex items-center justify-center font-bold">
-                  4
+                  5
                 </span>
                 Patient Information
               </CardTitle>
@@ -648,13 +855,15 @@ export function AppointmentBookingView({
                 </span>
               </div>
               <div className="flex justify-between py-1 border-b border-slate-100 dark:border-slate-800">
-                <span className="text-teal-700 dark:text-teal-400 font-medium">Advance Amount Required</span>
-                <span className="font-bold text-teal-700 dark:text-teal-400">
+                <span className="text-teal-700 dark:text-teal-400 font-bold">
+                  Advance Payable via UPI
+                </span>
+                <span className="font-bold text-teal-700 dark:text-teal-400 text-sm">
                   ₹{advanceAmount.toFixed(2)}
                 </span>
               </div>
               <div className="flex justify-between py-1 font-bold text-slate-900 dark:text-white">
-                <span>Remaining Balance at Clinic</span>
+                <span>Remaining at Clinic</span>
                 <span className="text-slate-700 dark:text-slate-300">
                   ₹{balanceAmount.toFixed(2)}
                 </span>
@@ -663,17 +872,39 @@ export function AppointmentBookingView({
               {selectedTime && (
                 <div className="p-2.5 rounded-xl bg-teal-100/60 dark:bg-teal-900/40 text-[11px] text-teal-900 dark:text-teal-100 space-y-0.5">
                   <p className="font-bold">✓ Selected Appointment:</p>
-                  <p>{selectedDate} at {selectedTime}</p>
+                  <p>
+                    {selectedDate} at {selectedTime}
+                  </p>
                   <p className="text-[10px] opacity-80">With {selectedDoctor?.user.fullName}</p>
                 </div>
               )}
 
+              {/* COD NOT ALLOWED CALLOUT */}
+              <div className="p-2.5 rounded-xl bg-amber-50 dark:bg-amber-950/40 border border-amber-200 dark:border-amber-800 text-[11px] text-amber-800 dark:text-amber-200 space-y-1">
+                <div className="flex items-center gap-1.5 font-bold">
+                  <Ban className="w-3.5 h-3.5 text-amber-600" />
+                  <span>No Cash on Delivery (COD)</span>
+                </div>
+                <p className="text-[10px] leading-tight opacity-90">
+                  Slot will only be locked after submitting the valid UPI UTR reference number above.
+                </p>
+              </div>
+
               <Button
                 type="submit"
-                disabled={submitting || !selectedTime || !fullName || !email}
-                className="w-full mt-2 font-bold shadow-md cursor-pointer"
+                disabled={
+                  submitting ||
+                  !selectedTime ||
+                  !fullName ||
+                  !email ||
+                  !upiTransactionId.trim() ||
+                  !upiPaidConfirmed
+                }
+                className="w-full mt-2 font-bold shadow-md cursor-pointer bg-teal-600 hover:bg-teal-700 text-white"
               >
-                {submitting ? "Reserving Slot..." : `Confirm Booking (Advance ₹${advanceAmount.toFixed(0)})`}
+                {submitting
+                  ? "Verifying UPI & Reserving..."
+                  : `Confirm Booking (Paid ₹${advanceAmount.toFixed(0)} via UPI)`}
               </Button>
             </CardContent>
           </Card>
