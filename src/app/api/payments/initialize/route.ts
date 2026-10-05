@@ -1,0 +1,29 @@
+import { NextRequest } from "next/server";
+import { successResponse, errorResponse } from "@/lib/utils/api-response";
+import { initializeAppointmentPayment } from "@/lib/services/payment.service";
+
+export async function POST(req: NextRequest) {
+  try {
+    const body = await req.json();
+    const { appointmentId, amountType } = body;
+
+    if (!appointmentId) {
+      return errorResponse("appointmentId is required", "BAD_REQUEST", 400);
+    }
+
+    const clientIp = req.headers.get("x-forwarded-for") || req.headers.get("x-real-ip") || undefined;
+    const userAgent = req.headers.get("user-agent") || undefined;
+
+    const checkoutData = await initializeAppointmentPayment({
+      appointmentId,
+      amountType,
+      clientIp,
+      userAgent,
+    });
+
+    return successResponse(checkoutData, "Payment initialized successfully", 200);
+  } catch (err: unknown) {
+    const message = err instanceof Error ? err.message : "Failed to initialize payment";
+    return errorResponse(message, "BAD_REQUEST", 400);
+  }
+}
