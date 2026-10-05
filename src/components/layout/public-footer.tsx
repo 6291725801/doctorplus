@@ -88,7 +88,7 @@ export function PublicFooter({
                 </div>
               )}
               <span className="font-extrabold text-xl text-white tracking-tight group-hover:text-emerald-400 transition">
-                {clinicName}
+                {clinicName.replace(/[-—].*$/g, "").trim() || "Doctor Plus"}
               </span>
             </Link>
 
@@ -99,7 +99,7 @@ export function PublicFooter({
             <div className="pt-2">
               <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-lg bg-emerald-950/60 border border-emerald-800/60 text-emerald-300 text-xs font-medium">
                 <span>🛡️</span>
-                <span>Certified Clinical Excellence & Authentic Healthcare</span>
+                <span>Certified Clinical Excellence & Patient Care</span>
               </div>
             </div>
 

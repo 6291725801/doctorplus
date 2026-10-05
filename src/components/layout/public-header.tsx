@@ -122,13 +122,11 @@ export function PublicHeader({
             )}
             <div>
               <span className="font-extrabold text-lg sm:text-xl tracking-tight text-slate-900 dark:text-white block group-hover:text-emerald-600 transition">
-                {clinicName}
+                {clinicName.replace(/[-—].*$/g, "").trim() || "Doctor Plus"}
               </span>
-              {tagline && (
-                <p className="text-[11px] text-slate-500 dark:text-slate-400 font-medium tracking-wide line-clamp-1">
-                  {tagline}
-                </p>
-              )}
+              <p className="text-[11px] text-slate-500 dark:text-slate-400 font-medium tracking-wide line-clamp-1">
+                Doctor & Specialized Medical Clinic
+              </p>
             </div>
           </Link>
 

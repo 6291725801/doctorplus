@@ -17,7 +17,7 @@ export async function PublicShell({ children }: PublicShellProps) {
   ]);
 
   const clinicName = siteSettings?.siteTitle || clinic?.name || "Doctor Plus";
-  const tagline = siteSettings?.tagline || "Advanced Healthcare & Specialized Clinical Services";
+  const tagline = siteSettings?.tagline || "Doctor & Specialized Medical Clinic";
   const logoUrl = siteSettings?.logoUrl || "/doctor-plus-icon.svg";
   const phone = siteSettings?.contactPhone || clinic?.phone || "+91 98765 43210";
   const email = siteSettings?.contactEmail || clinic?.email || "care@doctorplus.com";

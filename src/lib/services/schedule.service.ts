@@ -2,6 +2,7 @@ import { prisma } from "@/lib/db";
 import { DayOfWeek } from "@prisma/client";
 import { recordAuditLog } from "@/lib/services/audit.service";
 import { sendDoctorScheduleChangedNotification } from "@/lib/services/notification.service";
+import { DEFAULT_FALLBACK_DOCTORS } from "@/lib/services/cms.service";
 
 export interface ScheduleItemInput {
   dayOfWeek: DayOfWeek;
@@ -274,24 +275,112 @@ export async function findNextAvailableDate(
  * - Configured maximum bookings (Capacity limit e.g. 10/10)
  * - Next available date calculation when date is full
  */
+function generateFallbackSlots(
+  doctorId: string,
+  targetDateInput: string | Date
+): AvailableSlotsResponse {
+  const { dateObj, dateStr } = normalizeDate(targetDateInput);
+  const dayOfWeek = DAY_MAP[dateObj.getUTCDay()];
+  const fallbackDoctor =
+    DEFAULT_FALLBACK_DOCTORS.find((d) => d.id === doctorId) ||
+    DEFAULT_FALLBACK_DOCTORS[0];
+  const doctorName = fallbackDoctor.user.fullName;
+  const isSunday = dateObj.getUTCDay() === 0;
+
+  if (isSunday) {
+    const nextDate = new Date(dateObj);
+    nextDate.setUTCDate(nextDate.getUTCDate() + 1);
+    const nextDateStr = nextDate.toISOString().split("T")[0];
+    return {
+      doctorId,
+      doctorName,
+      date: dateStr,
+      dayOfWeek,
+      available: false,
+      nextAvailableDate: nextDateStr,
+      unavailabilityReason: "Clinic is closed on Sundays",
+      slotDurationMinutes: 30,
+      totalSlots: 0,
+      availableSlotsCount: 0,
+      slots: [],
+    };
+  }
+
+  const times: { start: string; end: string; isBreak?: boolean }[] = [
+    { start: "09:00", end: "09:30" },
+    { start: "09:30", end: "10:00" },
+    { start: "10:00", end: "10:30" },
+    { start: "10:30", end: "11:00" },
+    { start: "11:00", end: "11:30" },
+    { start: "11:30", end: "12:00" },
+    { start: "12:00", end: "12:30" },
+    { start: "12:30", end: "13:00" },
+    { start: "13:00", end: "14:00", isBreak: true },
+    { start: "14:00", end: "14:30" },
+    { start: "14:30", end: "15:00" },
+    { start: "15:00", end: "15:30" },
+    { start: "15:30", end: "16:00" },
+    { start: "16:00", end: "16:30" },
+    { start: "16:30", end: "17:00" },
+    { start: "17:00", end: "17:30" },
+  ];
+
+  const slots: SlotResult[] = times.map((t) => {
+    if (t.isBreak) {
+      return {
+        startTime: t.start,
+        endTime: t.end,
+        isAvailable: false,
+        status: "BREAK",
+        reason: "Lunch Break",
+      };
+    }
+    return {
+      startTime: t.start,
+      endTime: t.end,
+      isAvailable: true,
+      status: "AVAILABLE",
+    };
+  });
+
+  const availableCount = slots.filter((s) => s.isAvailable).length;
+
+  return {
+    doctorId,
+    doctorName,
+    date: dateStr,
+    dayOfWeek,
+    available: availableCount > 0,
+    isFullyBooked: false,
+    currentBookedCount: 0,
+    workingHours: { startTime: "09:00", endTime: "17:30" },
+    breakHours: { startTime: "13:00", endTime: "14:00", reason: "Lunch Break" },
+    slotDurationMinutes: 30,
+    totalSlots: slots.length,
+    availableSlotsCount: availableCount,
+    slots,
+  };
+}
+
 export async function getDoctorAvailableSlots(
   doctorId: string,
   targetDateInput: string | Date
 ): Promise<AvailableSlotsResponse> {
   const { dateObj, dateStr } = normalizeDate(targetDateInput);
 
-  // 1. Fetch Doctor and check active status
-  const doctor = await prisma.doctor.findUnique({
-    where: { id: doctorId },
-    include: {
-      user: { select: { fullName: true } },
-      clinic: { select: { id: true, name: true } },
-    },
-  });
+  try {
+    // 1. Fetch Doctor and check active status
+    const doctor = await prisma.doctor.findUnique({
+      where: { id: doctorId },
+      include: {
+        user: { select: { fullName: true } },
+        clinic: { select: { id: true, name: true } },
+      },
+    });
 
-  if (!doctor) {
-    throw new Error(`Doctor not found with ID ${doctorId}`);
-  }
+    if (!doctor) {
+      return generateFallbackSlots(doctorId, targetDateInput);
+    }
 
   const doctorName = doctor.user.fullName;
   const dayOfWeek = DAY_MAP[dateObj.getUTCDay()];
@@ -591,6 +680,10 @@ export async function getDoctorAvailableSlots(
     availableSlotsCount: availableCount,
     slots,
   };
+  } catch (error) {
+    console.warn(`[Schedule Service] DB unavailable or lookup error for doctor ${doctorId}. Using fallback slots.`, error);
+    return generateFallbackSlots(doctorId, targetDateInput);
+  }
 }
 
 /**

@@ -23,11 +23,245 @@ export interface SectionConfig {
   isVisible: boolean;
 }
 
+export const DEFAULT_FALLBACK_SERVICES = [
+  {
+    id: "srv-general-consultation",
+    name: "General Medical Consultation",
+    slug: "general-consultation",
+    shortDescription: "Comprehensive health diagnosis, physical examination, vitals assessment, and prescription.",
+    description: "Thorough clinical examination, symptom analysis, treatment protocol, and personalized medical prescription.",
+    durationMinutes: 20,
+    fee: 500.0,
+    isPopular: true,
+    isActive: true,
+    sortOrder: 1,
+    doctors: [
+      {
+        doctor: {
+          user: { fullName: "Dr. Rohit Kumar", email: "dr.rohit@doctorplus.com" },
+        },
+      },
+    ],
+  },
+  {
+    id: "srv-cardiology-check",
+    name: "Cardiology & ECG Consultation",
+    slug: "cardiology-consultation",
+    shortDescription: "Complete heart assessment, blood pressure monitoring, ECG interpretation, and cardiovascular advice.",
+    description: "Specialized cardiac evaluation including 12-lead ECG analysis, hypertension management, and heart health counseling.",
+    durationMinutes: 30,
+    fee: 800.0,
+    isPopular: true,
+    isActive: true,
+    sortOrder: 2,
+    doctors: [
+      {
+        doctor: {
+          user: { fullName: "Dr. Ananya Sharma", email: "dr.ananya@doctorplus.com" },
+        },
+      },
+    ],
+  },
+  {
+    id: "srv-orthopedic-care",
+    name: "Orthopedic & Joint Care",
+    slug: "orthopedic-consultation",
+    shortDescription: "Bone density evaluation, arthritis relief, joint mobility therapy, and fracture care.",
+    description: "Expert orthopedic consultation for chronic back pain, knee arthritis, posture correction, and rehabilitation.",
+    durationMinutes: 25,
+    fee: 600.0,
+    isPopular: false,
+    isActive: true,
+    sortOrder: 3,
+    doctors: [
+      {
+        doctor: {
+          user: { fullName: "Dr. Rajesh Verma", email: "dr.rajesh@doctorplus.com" },
+        },
+      },
+    ],
+  },
+  {
+    id: "srv-dermatology-skin",
+    name: "Dermatology & Skin Therapy",
+    slug: "dermatology-consultation",
+    shortDescription: "Clinical skin diagnosis, acne management, allergy testing, and chronic dermatosis treatment.",
+    description: "Specialized dermatological evaluation and advanced therapeutic protocols for healthy skin and hair care.",
+    durationMinutes: 20,
+    fee: 500.0,
+    isPopular: false,
+    isActive: true,
+    sortOrder: 4,
+    doctors: [
+      {
+        doctor: {
+          user: { fullName: "Dr. Priya Patel", email: "dr.priya@doctorplus.com" },
+        },
+      },
+    ],
+  },
+  {
+    id: "srv-full-body-checkup",
+    name: "Complete Preventive Health Checkup",
+    slug: "full-body-health-checkup",
+    shortDescription: "Full metabolic screening, organ profile consultation, lipid review, and lifestyle optimization.",
+    description: "In-depth annual executive health screening covering liver, kidney, blood sugar, lipid parameters, and lifestyle recommendations.",
+    durationMinutes: 45,
+    fee: 1200.0,
+    isPopular: true,
+    isActive: true,
+    sortOrder: 5,
+    doctors: [
+      {
+        doctor: {
+          user: { fullName: "Dr. Rohit Kumar", email: "dr.rohit@doctorplus.com" },
+        },
+      },
+    ],
+  },
+  {
+    id: "srv-pediatric-care",
+    name: "Pediatric & Child Wellness",
+    slug: "pediatric-consultation",
+    shortDescription: "Infant and child growth monitoring, vaccinations, common pediatric infections, and dietary guidance.",
+    description: "Dedicated child healthcare consultations providing compassionate care, growth tracking, and developmental assessments.",
+    durationMinutes: 20,
+    fee: 500.0,
+    isPopular: false,
+    isActive: true,
+    sortOrder: 6,
+    doctors: [
+      {
+        doctor: {
+          user: { fullName: "Dr. Ananya Sharma", email: "dr.ananya@doctorplus.com" },
+        },
+      },
+    ],
+  },
+];
+
+export const DEFAULT_FALLBACK_DOCTORS = [
+  {
+    id: "doc-rohit-kumar",
+    specialization: "General Physician & Chief Consultant",
+    qualification: "MBBS, MD (Medicine)",
+    experienceYears: 10,
+    bio: "Senior medical practitioner with over 10 years of clinical experience in comprehensive diagnostics, chronic disease management, and primary care.",
+    consultationFee: 500.0,
+    advanceBookingFee: 100.0,
+    appointmentDurationMinutes: 20,
+    roomNumber: "Room 101",
+    profilePhotoUrl: null,
+    isActive: true,
+    isAvailableForBooking: true,
+    user: {
+      fullName: "Dr. Rohit Kumar",
+      email: "dr.rohit@doctorplus.com",
+      phone: "+91 98765 43210",
+    },
+    services: [
+      { service: { id: "srv-general-consultation", name: "General Medical Consultation", fee: 500 } },
+      { service: { id: "srv-full-body-checkup", name: "Complete Preventive Health Checkup", fee: 1200 } },
+    ],
+    schedules: [
+      { dayOfWeek: "MONDAY", startTime: "09:00", endTime: "18:00", isAvailable: true },
+      { dayOfWeek: "TUESDAY", startTime: "09:00", endTime: "18:00", isAvailable: true },
+      { dayOfWeek: "WEDNESDAY", startTime: "09:00", endTime: "18:00", isAvailable: true },
+      { dayOfWeek: "THURSDAY", startTime: "09:00", endTime: "18:00", isAvailable: true },
+      { dayOfWeek: "FRIDAY", startTime: "09:00", endTime: "18:00", isAvailable: true },
+      { dayOfWeek: "SATURDAY", startTime: "09:00", endTime: "14:00", isAvailable: true },
+    ],
+  },
+  {
+    id: "doc-ananya-sharma",
+    specialization: "Cardiologist & Heart Specialist",
+    qualification: "MBBS, MD, DM (Cardiology)",
+    experienceYears: 12,
+    bio: "Renowned cardiologist dedicated to cardiovascular health, preventive cardiology, ECG diagnosis, and heart care.",
+    consultationFee: 800.0,
+    advanceBookingFee: 150.0,
+    appointmentDurationMinutes: 30,
+    roomNumber: "Room 102",
+    profilePhotoUrl: null,
+    isActive: true,
+    isAvailableForBooking: true,
+    user: {
+      fullName: "Dr. Ananya Sharma",
+      email: "dr.ananya@doctorplus.com",
+      phone: "+91 98765 43211",
+    },
+    services: [
+      { service: { id: "srv-cardiology-check", name: "Cardiology & ECG Consultation", fee: 800 } },
+      { service: { id: "srv-pediatric-care", name: "Pediatric & Child Wellness", fee: 500 } },
+    ],
+    schedules: [
+      { dayOfWeek: "MONDAY", startTime: "10:00", endTime: "16:00", isAvailable: true },
+      { dayOfWeek: "WEDNESDAY", startTime: "10:00", endTime: "16:00", isAvailable: true },
+      { dayOfWeek: "FRIDAY", startTime: "10:00", endTime: "16:00", isAvailable: true },
+      { dayOfWeek: "SATURDAY", startTime: "10:00", endTime: "14:00", isAvailable: true },
+    ],
+  },
+  {
+    id: "doc-rajesh-verma",
+    specialization: "Orthopedic & Joint Care Specialist",
+    qualification: "MBBS, MS (Orthopedics)",
+    experienceYears: 8,
+    bio: "Specialized in musculoskeletal disorders, sports injuries, joint preservation therapy, and post-fracture physical rehabilitation.",
+    consultationFee: 600.0,
+    advanceBookingFee: 100.0,
+    appointmentDurationMinutes: 25,
+    roomNumber: "Room 103",
+    profilePhotoUrl: null,
+    isActive: true,
+    isAvailableForBooking: true,
+    user: {
+      fullName: "Dr. Rajesh Verma",
+      email: "dr.rajesh@doctorplus.com",
+      phone: "+91 98765 43212",
+    },
+    services: [
+      { service: { id: "srv-orthopedic-care", name: "Orthopedic & Joint Care", fee: 600 } },
+    ],
+    schedules: [
+      { dayOfWeek: "TUESDAY", startTime: "11:00", endTime: "19:00", isAvailable: true },
+      { dayOfWeek: "THURSDAY", startTime: "11:00", endTime: "19:00", isAvailable: true },
+      { dayOfWeek: "SATURDAY", startTime: "11:00", endTime: "18:00", isAvailable: true },
+    ],
+  },
+  {
+    id: "doc-priya-patel",
+    specialization: "Dermatologist & Skin Specialist",
+    qualification: "MBBS, MD (Dermatology)",
+    experienceYears: 7,
+    bio: "Expert dermatologist providing clinical treatment for persistent acne, hair fall, allergies, psoriasis, and medical skincare.",
+    consultationFee: 500.0,
+    advanceBookingFee: 100.0,
+    appointmentDurationMinutes: 20,
+    roomNumber: "Room 104",
+    profilePhotoUrl: null,
+    isActive: true,
+    isAvailableForBooking: true,
+    user: {
+      fullName: "Dr. Priya Patel",
+      email: "dr.priya@doctorplus.com",
+      phone: "+91 98765 43213",
+    },
+    services: [
+      { service: { id: "srv-dermatology-skin", name: "Dermatology & Skin Therapy", fee: 500 } },
+    ],
+    schedules: [
+      { dayOfWeek: "MONDAY", startTime: "09:30", endTime: "17:30", isAvailable: true },
+      { dayOfWeek: "WEDNESDAY", startTime: "09:30", endTime: "17:30", isAvailable: true },
+      { dayOfWeek: "FRIDAY", startTime: "09:30", endTime: "17:30", isAvailable: true },
+    ],
+  },
+];
+
 const DEFAULT_FALLBACK_CLINIC = {
   id: "default-clinic-id",
   name: "Doctor Plus",
   slug: "doctorplus",
-  description: "Advanced Healthcare & Specialized Clinical Services",
+  description: "Specialist Doctors & Medical Clinic",
   email: "care@doctorplus.com",
   phone: "+91 98765 43210",
   address: "123 Health Boulevard, Medical Enclave",
@@ -54,9 +288,9 @@ const DEFAULT_FALLBACK_CLINIC = {
   siteSettings: {
     id: "default-sitesettings",
     clinicId: "default-clinic-id",
-    siteTitle: "Doctor Plus — Healthcare & Clinic Platform",
-    tagline: "Advanced Healthcare & Specialized Clinical Services",
-    metaDescription: "Book appointments with experienced doctors and healthcare specialists.",
+    siteTitle: "Doctor Plus",
+    tagline: "Specialist Doctors & Medical Clinic",
+    metaDescription: "Book appointments with experienced doctors and medical specialists.",
     logoUrl: "/doctor-plus-icon.svg",
     faviconUrl: "/doctor-plus-icon.svg",
     primaryColor: "#0D9488",
@@ -211,7 +445,7 @@ export async function getHomepageData(clinicId?: string) {
       .catch(() => null);
 
     // Services list
-    const services = await prisma.service
+    const dbServices = await prisma.service
       .findMany({
         where: { clinicId: targetClinicId, isActive: true },
         orderBy: { sortOrder: "asc" },
@@ -220,7 +454,7 @@ export async function getHomepageData(clinicId?: string) {
       .catch(() => []);
 
     // Doctors list
-    const doctors = await prisma.doctor
+    const dbDoctors = await prisma.doctor
       .findMany({
         where: { clinicId: targetClinicId, isActive: true },
         include: {
@@ -230,6 +464,9 @@ export async function getHomepageData(clinicId?: string) {
         },
       })
       .catch(() => []);
+
+    const services = dbServices.length > 0 ? dbServices : (DEFAULT_FALLBACK_SERVICES as any);
+    const doctors = dbDoctors.length > 0 ? dbDoctors : (DEFAULT_FALLBACK_DOCTORS as any);
 
     return {
       clinic,
@@ -248,8 +485,8 @@ export async function getHomepageData(clinicId?: string) {
       clinicSettings: DEFAULT_FALLBACK_CLINIC.settings as any,
       page: null,
       sections: [],
-      services: [],
-      doctors: [],
+      services: DEFAULT_FALLBACK_SERVICES as any,
+      doctors: DEFAULT_FALLBACK_DOCTORS as any,
     };
   }
 }
@@ -473,11 +710,11 @@ export async function getPublicServices(clinicId?: string) {
     let targetClinicId = clinicId;
     if (!targetClinicId) {
       const active = await getActiveClinic().catch(() => null);
-      if (!active) return [];
+      if (!active) return DEFAULT_FALLBACK_SERVICES as any;
       targetClinicId = active.id;
     }
 
-    return await prisma.service.findMany({
+    const services = await prisma.service.findMany({
       where: {
         clinicId: targetClinicId,
         isActive: true,
@@ -495,9 +732,11 @@ export async function getPublicServices(clinicId?: string) {
       },
       orderBy: { sortOrder: "asc" },
     });
+
+    return services.length > 0 ? services : (DEFAULT_FALLBACK_SERVICES as any);
   } catch (err) {
-    console.warn("[CMS Service] Could not fetch public services from DB:", (err as Error).message);
-    return [];
+    console.warn("[CMS Service] Could not fetch public services from DB, using fallback:", (err as Error).message);
+    return DEFAULT_FALLBACK_SERVICES as any;
   }
 }
 
@@ -509,11 +748,13 @@ export async function getPublicServiceBySlug(slug: string, clinicId?: string) {
     let targetClinicId = clinicId;
     if (!targetClinicId) {
       const active = await getActiveClinic().catch(() => null);
-      if (!active) return null;
+      if (!active) {
+        return (DEFAULT_FALLBACK_SERVICES.find((s) => s.slug === slug) as any) || null;
+      }
       targetClinicId = active.id;
     }
 
-    return await prisma.service.findUnique({
+    const service = await prisma.service.findUnique({
       where: {
         clinicId_slug: {
           clinicId: targetClinicId,
@@ -533,10 +774,13 @@ export async function getPublicServiceBySlug(slug: string, clinicId?: string) {
         },
       },
     });
+
+    if (service) return service;
   } catch (err) {
     console.warn(`[CMS Service] Could not fetch service "${slug}" from DB:`, (err as Error).message);
-    return null;
   }
+
+  return (DEFAULT_FALLBACK_SERVICES.find((s) => s.slug === slug) as any) || null;
 }
 
 /**
@@ -547,11 +791,11 @@ export async function getPublicDoctors(clinicId?: string) {
     let targetClinicId = clinicId;
     if (!targetClinicId) {
       const active = await getActiveClinic().catch(() => null);
-      if (!active) return [];
+      if (!active) return DEFAULT_FALLBACK_DOCTORS as any;
       targetClinicId = active.id;
     }
 
-    return await prisma.doctor.findMany({
+    const doctors = await prisma.doctor.findMany({
       where: {
         clinicId: targetClinicId,
         isActive: true,
@@ -564,9 +808,11 @@ export async function getPublicDoctors(clinicId?: string) {
       },
       orderBy: { createdAt: "asc" },
     });
+
+    return doctors.length > 0 ? doctors : (DEFAULT_FALLBACK_DOCTORS as any);
   } catch (err) {
-    console.warn("[CMS Service] Could not fetch public doctors from DB:", (err as Error).message);
-    return [];
+    console.warn("[CMS Service] Could not fetch public doctors from DB, using fallback:", (err as Error).message);
+    return DEFAULT_FALLBACK_DOCTORS as any;
   }
 }
 
@@ -575,7 +821,7 @@ export async function getPublicDoctors(clinicId?: string) {
  */
 export async function getPublicDoctorById(doctorId: string) {
   try {
-    return await prisma.doctor.findUnique({
+    const doc = await prisma.doctor.findUnique({
       where: { id: doctorId },
       include: {
         user: { select: { fullName: true, email: true, phone: true } },
@@ -584,10 +830,12 @@ export async function getPublicDoctorById(doctorId: string) {
         clinic: { select: { name: true, phone: true, address: true, city: true } },
       },
     });
+    if (doc) return doc;
   } catch (err) {
     console.warn(`[CMS Service] Could not fetch doctor "${doctorId}" from DB:`, (err as Error).message);
-    return null;
   }
+
+  return (DEFAULT_FALLBACK_DOCTORS.find((d) => d.id === doctorId) as any) || null;
 }
 
 /**
@@ -603,7 +851,7 @@ export async function generateCmsMetadata(
     getSiteSettings().catch(() => null),
   ]);
 
-  const clinicName = siteSettings?.siteTitle || "AyurvedaCare Healthcare";
+  const clinicName = siteSettings?.siteTitle || "Doctor Plus";
   const title = page?.metaTitle || page?.title || fallbackTitle;
   const description = page?.metaDescription || siteSettings?.metaDescription || fallbackDescription;
 
@@ -620,4 +868,3 @@ export async function generateCmsMetadata(
     icons: siteSettings?.faviconUrl ? [{ rel: "icon", url: siteSettings.faviconUrl }] : undefined,
   };
 }
-

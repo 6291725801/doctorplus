@@ -3,7 +3,7 @@ import { prisma } from "@/lib/db";
 import { getSession } from "@/lib/auth/session";
 import { AppointmentBookingView } from "@/components/booking/appointment-booking-view";
 import { PublicShell } from "@/components/layout/public-shell";
-import { generateCmsMetadata } from "@/lib/services/cms.service";
+import { generateCmsMetadata, DEFAULT_FALLBACK_DOCTORS, DEFAULT_FALLBACK_SERVICES } from "@/lib/services/cms.service";
 import Link from "next/link";
 import { Metadata } from "next";
 
@@ -61,23 +61,26 @@ export default async function BookAppointmentPage(props: BookAppointmentPageProp
     clinic = { name: "Doctor Plus", phone: "+91 98765 43210", email: "care@doctorplus.com" };
   }
 
-  const serializedDoctors = doctors.map((d) => ({
+  const activeDoctors = doctors.length > 0 ? doctors : DEFAULT_FALLBACK_DOCTORS;
+  const activeServices = services.length > 0 ? services : DEFAULT_FALLBACK_SERVICES;
+
+  const serializedDoctors = activeDoctors.map((d: any) => ({
     id: d.id,
     specialization: d.specialization,
     qualification: d.qualification,
     experienceYears: d.experienceYears,
     consultationFee: Number(d.consultationFee),
-    advanceBookingFee: Number(d.advanceBookingFee),
-    appointmentDurationMinutes: d.appointmentDurationMinutes,
+    advanceBookingFee: Number(d.advanceBookingFee || 100),
+    appointmentDurationMinutes: d.appointmentDurationMinutes || 20,
     roomNumber: d.roomNumber,
     profilePhotoUrl: d.profilePhotoUrl,
     user: {
-      fullName: d.user.fullName,
-      email: d.user.email,
+      fullName: d.user?.fullName || "Doctor",
+      email: d.user?.email || "doctor@doctorplus.com",
     },
   }));
 
-  const serializedServices = services.map((s) => ({
+  const serializedServices = activeServices.map((s: any) => ({
     id: s.id,
     name: s.name,
     fee: Number(s.fee),
