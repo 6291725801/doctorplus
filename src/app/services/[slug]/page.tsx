@@ -13,7 +13,7 @@ export async function generateMetadata({ params }: RouteParams) {
   const service = await getPublicServiceBySlug(slug).catch(() => null);
   const siteSettings = await getSiteSettings().catch(() => null);
 
-  const clinicName = siteSettings?.siteTitle || "AyurvedaCare Clinic";
+  const clinicName = siteSettings?.siteTitle || "Doctor Plus";
   if (!service) {
     return { title: `Service Details | ${clinicName}` };
   }

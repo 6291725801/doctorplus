@@ -26,10 +26,10 @@ export default async function HomePage() {
   const heroSection = sections.find((s) => s.sectionType === "HERO");
   const heroContent = (heroSection?.content as Record<string, string | undefined>) || {};
 
-  const heroHeading = heroSection?.title || "Natural Healing, Modern Care & Specialized Ayurveda";
+  const heroHeading = heroSection?.title || "Specialized Healthcare, Modern Consultations & Clinical Care";
   const heroParagraph =
     heroContent.paragraph ||
-    "Experience personalized medical consultations, authentic Ayurvedic therapies, and compassionate holistic care with certified healthcare specialists.";
+    "Experience personalized medical consultations, specialized therapies, and compassionate clinical care with certified healthcare specialists.";
   const heroImage = heroContent.imageUrl || "/hero-clinic.jpg";
   const heroCtaText = heroContent.ctaText || "Book Doctor Appointment";
   const heroCtaLink = heroContent.ctaLink || "/book";
@@ -75,9 +75,9 @@ export default async function HomePage() {
     },
     {
       name: "Ananya Deshmukh",
-      treatment: "Stress & Sleep Care",
+      treatment: "Preventive Health & Wellness",
       quote:
-        "Authentic Ayurveda with modern clinical hygiene. I appreciate the transparent fee structure and personalized herbal recommendations.",
+        "Exceptional medical care and modern clinical hygiene. I appreciate the transparent fee structure, prompt appointments, and personalized medical attention.",
       rating: 5,
     },
   ];
@@ -137,11 +137,11 @@ export default async function HomePage() {
                 <div className="pt-6 border-t border-slate-200/80 dark:border-slate-800 grid grid-cols-3 gap-4 text-center sm:text-left">
                   <div>
                     <p className="text-2xl sm:text-3xl font-extrabold text-slate-900 dark:text-white">100%</p>
-                    <p className="text-xs text-slate-500 font-medium">Holistic Healing</p>
+                    <p className="text-xs text-slate-500 font-medium">Verified Care</p>
                   </div>
                   <div>
                     <p className="text-2xl sm:text-3xl font-extrabold text-slate-900 dark:text-white">Certified</p>
-                    <p className="text-xs text-slate-500 font-medium">Ayurveda Doctors</p>
+                    <p className="text-xs text-slate-500 font-medium">Expert Doctors</p>
                   </div>
                   <div>
                     <p className="text-2xl sm:text-3xl font-extrabold text-slate-900 dark:text-white">Live Slots</p>

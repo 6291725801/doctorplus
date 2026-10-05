@@ -19,12 +19,12 @@ export default async function AboutPage() {
     getHomepageData().catch(() => null),
   ]);
 
-  const clinicName = clinic?.name || "AyurvedaCare Clinic";
+  const clinicName = clinic?.name || "Doctor Plus";
   const aboutSection = homeData?.sections.find((s) => s.sectionType === "ABOUT");
   const aboutContent = (aboutSection?.content as Record<string, string | undefined>) || {};
-  const aboutTitle = aboutSection?.title || "Restoring Equilibrium Through Root-Cause Healing";
-  const aboutSubtitle = aboutSection?.subtitle || "Bridging timeless Ayurvedic wisdom with contemporary clinical excellence, personalized patient care, and evidence-informed therapies.";
-  const aboutParagraph = aboutContent.paragraph || `At ${clinicName}, we believe true healthcare is proactive, personalized, and restorative. Rather than merely masking chronic symptoms, our clinical protocols aim to diagnose the underlying imbalances in your body's doshic constitution and metabolic fire (Agni).`;
+  const aboutTitle = aboutSection?.title || "Clinical Excellence & Compassionate Medical Care";
+  const aboutSubtitle = aboutSection?.subtitle || "Bridging modern clinical diagnostic expertise with personalized patient care, specialized consultations, and compassionate medical attention.";
+  const aboutParagraph = aboutContent.paragraph || `At ${clinicName}, we believe true healthcare is proactive, personalized, and restorative. Our clinical protocols aim to diagnose and treat health conditions thoroughly with specialized care and certified medical specialists.`;
   const aboutImage = aboutContent.imageUrl || "/hero-clinic.jpg";
   const aboutYears = aboutContent.yearsExperience || "12+ Years";
 

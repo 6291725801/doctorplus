@@ -214,7 +214,7 @@ export async function getAppointmentReceipt(appointmentId: string, userId: strin
       name: clinic.name,
       address: siteSettings?.address || clinic.address || "123 Health Boulevard, Healthcare District",
       phone: siteSettings?.contactPhone || clinic.phone || "+91 98765 43210",
-      email: siteSettings?.contactEmail || clinic.email || "care@ayurvedacare.com",
+      email: siteSettings?.contactEmail || clinic.email || "support@doctorplus.com",
       logoUrl: siteSettings?.logoUrl,
     },
     patient: {

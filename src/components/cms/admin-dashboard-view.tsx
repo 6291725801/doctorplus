@@ -152,11 +152,11 @@ export function AdminDashboardView({ initialData, userRole = "CLINIC_ADMIN" }: A
   const heroContent = (heroSection?.content as Record<string, string | undefined>) || {};
 
   const [heroHeading, setHeroHeading] = useState<string>(
-    heroSection?.title || "Natural Healing, Modern Care & Specialized Ayurveda"
+    heroSection?.title || "Specialized Healthcare, Modern Consultations & Clinical Care"
   );
   const [heroParagraph, setHeroParagraph] = useState<string>(
     heroContent.paragraph ||
-      "Experience personalized medical consultations, authentic Ayurvedic therapies, and compassionate holistic care with certified healthcare specialists."
+      "Experience personalized medical consultations, specialized clinical therapies, and compassionate care with certified healthcare specialists."
   );
   const [heroImage, setHeroImage] = useState<string>(
     heroContent.imageUrl || "/hero-clinic.jpg"
@@ -222,8 +222,8 @@ export function AdminDashboardView({ initialData, userRole = "CLINIC_ADMIN" }: A
       },
       {
         name: "Ananya Deshmukh",
-        treatment: "Stress & Sleep Care",
-        quote: "Authentic Ayurveda with modern clinical hygiene. I appreciate the transparent fee structure and personalized herbal recommendations.",
+        treatment: "Preventive Health & Wellness",
+        quote: "Exceptional clinical care and modern hygiene. I appreciate the transparent fee structure, prompt appointments, and personalized medical attention.",
         rating: 5,
       },
     ];
@@ -1681,7 +1681,7 @@ export function AdminDashboardView({ initialData, userRole = "CLINIC_ADMIN" }: A
                 label="Clinic Registered Practice Name"
                 value={clinicName}
                 onChange={(e) => setClinicName(e.target.value)}
-                placeholder="e.g. AyurvedaCare Clinical Center"
+                placeholder="e.g. Doctor Plus Specialized Clinic"
               />
               <Input
                 label="Site / Brand Display Title"

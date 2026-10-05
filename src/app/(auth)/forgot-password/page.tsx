@@ -3,7 +3,7 @@ import { Metadata } from "next";
 import { ForgotPasswordForm } from "@/components/auth/forgot-password-form";
 
 export const metadata: Metadata = {
-  title: "Forgot Password | Clinic Portal",
+  title: "Forgot Password | Doctor Plus",
   description: "Request a password reset link for your clinic account.",
 };
 

@@ -14,7 +14,7 @@ export async function generateMetadata({ params }: RouteParams) {
   const doctor = await getPublicDoctorById(id).catch(() => null);
   const siteSettings = await getSiteSettings().catch(() => null);
 
-  const clinicName = siteSettings?.siteTitle || "AyurvedaCare Clinic";
+  const clinicName = siteSettings?.siteTitle || "Doctor Plus";
   if (!doctor) {
     return { title: `Doctor Details | ${clinicName}` };
   }

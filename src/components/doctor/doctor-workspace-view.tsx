@@ -395,7 +395,7 @@ export function DoctorWorkspaceView({ doctor: initialDoctor, appointments: initi
               )}
             </div>
             <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">
-              {specialization} • {qualification} • {doctor.clinic?.name || "AyurvedaCare"}
+              {specialization} • {qualification} • {doctor.clinic?.name || "Doctor Plus"}
             </p>
           </div>
         </div>

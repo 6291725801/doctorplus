@@ -3,7 +3,7 @@ import { Metadata } from "next";
 import { SignupForm } from "@/components/auth/signup-form";
 
 export const metadata: Metadata = {
-  title: "Patient Registration | Clinic Portal",
+  title: "Patient Registration | Doctor Plus",
   description: "Create your patient account to book appointments and view medical records.",
 };
 

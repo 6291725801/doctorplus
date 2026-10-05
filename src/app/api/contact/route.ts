@@ -26,7 +26,7 @@ export async function POST(request: NextRequest) {
       <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px; border: 1px solid #e2e8f0; border-radius: 12px; background-color: #ffffff;">
         <div style="background-color: #0d9488; padding: 16px 20px; border-radius: 8px; color: #ffffff; margin-bottom: 20px;">
           <h2 style="margin: 0; font-size: 20px;">📬 New Patient Inquiry Received</h2>
-          <p style="margin: 4px 0 0 0; font-size: 13px; opacity: 0.9;">AyurvedaCare Clinic Portal</p>
+          <p style="margin: 4px 0 0 0; font-size: 13px; opacity: 0.9;">Doctor Plus Medical Clinic</p>
         </div>
 
         <table style="width: 100%; border-collapse: collapse; margin-bottom: 20px; font-size: 14px;">
@@ -101,7 +101,7 @@ ${validated.message}
         </div>
         <p style="font-size: 13px; color: #64748b;">
           Warm regards,<br />
-          <strong>Doctor Plus / AyurvedaCare Front Desk Team</strong>
+          <strong>Doctor Plus Medical Clinic Desk</strong>
         </p>
       </div>
     `;

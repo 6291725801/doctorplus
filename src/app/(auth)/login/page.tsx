@@ -3,7 +3,7 @@ import { Metadata } from "next";
 import { LoginForm } from "@/components/auth/login-form";
 
 export const metadata: Metadata = {
-  title: "Sign In | Clinic Portal",
+  title: "Sign In | Doctor Plus",
   description: "Sign in to your doctor, clinic staff, or patient portal account.",
 };
 

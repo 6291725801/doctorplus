@@ -24,13 +24,18 @@ export default async function DashboardLayout({
       <header className="sticky top-0 z-40 bg-white border-b border-slate-200 shadow-xs dark:bg-slate-900 dark:border-slate-800">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
           <div className="flex items-center space-x-3">
-            <Link href="/" className="flex items-center space-x-2">
-              <div className="h-8 w-8 rounded-lg bg-teal-600 flex items-center justify-center text-white font-bold text-lg">
+            <Link href="/" className="flex items-center space-x-2.5 group">
+              <div className="h-9 w-9 rounded-xl bg-gradient-to-tr from-emerald-600 to-teal-500 flex items-center justify-center text-white font-bold text-lg shadow-sm shadow-emerald-500/20 ring-2 ring-emerald-50 dark:ring-emerald-950/40">
                 +
               </div>
-              <span className="font-bold text-lg tracking-tight text-slate-900 dark:text-white">
-                Care<span className="text-teal-600">Platform</span>
-              </span>
+              <div>
+                <span className="font-extrabold text-base tracking-tight text-slate-900 dark:text-white block leading-tight">
+                  Doctor Plus
+                </span>
+                <p className="text-[10px] text-slate-500 dark:text-slate-400 font-medium tracking-wide">
+                  Doctor & Specialized Medical Clinic
+                </p>
+              </div>
             </Link>
             <span className="text-slate-300 dark:text-slate-700">|</span>
             <Badge variant="teal">{session.role.replace("_", " ")}</Badge>
@@ -65,7 +70,7 @@ export default async function DashboardLayout({
 
       {/* Footer */}
       <footer className="border-t border-slate-200 bg-white py-4 text-center text-xs text-slate-500 dark:border-slate-800 dark:bg-slate-900">
-        Healthcare & Clinic Appointment Management System — Foundation Layer
+        Doctor Plus — Doctor & Specialized Medical Clinic
       </footer>
     </div>
   );
