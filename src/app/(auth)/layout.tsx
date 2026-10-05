@@ -14,11 +14,11 @@ export default function AuthLayout({
             +
           </div>
           <span className="text-2xl font-bold tracking-tight text-slate-900 dark:text-white">
-            Care<span className="text-teal-600">Platform</span>
+            Doctor <span className="text-teal-600">Plus</span>
           </span>
         </Link>
         <p className="mt-1 text-sm text-slate-500 dark:text-slate-400">
-          Professional Healthcare & Appointment Portal
+          Doctor & Specialized Medical Clinic
         </p>
       </div>
 
